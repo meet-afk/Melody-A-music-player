@@ -4,6 +4,7 @@ import 'package:client/core/theme/app_pallete.dart';
 import 'package:client/core/utils.dart';
 import 'package:client/features/home/viewmodel/home_viewmodel.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -229,12 +230,18 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(10.0),
-                        child: IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            CupertinoIcons.shuffle,
-                            color: Pallete.whiteColor,
-                          ),
+                        child: StreamBuilder<bool>(
+                          stream: songNotifier.audioPlayer?.shuffleModeEnabledStream,
+                          builder: (context, snapshot) {
+                            final isShuffleEnabled = snapshot.data ?? false;
+                            return IconButton(
+                              onPressed: songNotifier.toggleShuffle,
+                              icon: Icon(
+                                CupertinoIcons.shuffle,
+                                color: isShuffleEnabled ? Pallete.gradient2 : Pallete.whiteColor,
+                              ),
+                            );
+                          }
                         ),
                       ),
                       Padding(
@@ -281,12 +288,29 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                       ),
                       Padding(
                         padding: const EdgeInsets.all(10.0),
-                        child: IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            CupertinoIcons.repeat,
-                            color: Pallete.whiteColor,
-                          ),
+                        child: StreamBuilder<LoopMode>(
+                          stream: songNotifier.audioPlayer?.loopModeStream,
+                          builder: (context, snapshot) {
+                            final loopMode = snapshot.data ?? LoopMode.off;
+                            
+                            IconData iconData = CupertinoIcons.repeat;
+                            Color iconColor = Pallete.whiteColor;
+                            
+                            if (loopMode == LoopMode.all) {
+                               iconColor = Pallete.gradient2; 
+                            } else if (loopMode == LoopMode.one) {
+                               iconData = CupertinoIcons.repeat_1;
+                               iconColor = Pallete.gradient2; 
+                            }
+
+                            return IconButton(
+                              onPressed: songNotifier.toggleRepeat,
+                              icon: Icon(
+                                iconData,
+                                color: iconColor,
+                              ),
+                            );
+                          }
                         ),
                       ),
                     ],
@@ -298,9 +322,24 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                       Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: IconButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            // Safely grab the ID
+                            final deleteId = currnetSong.id;
+                            
+                            // 1. Instantly pop out of the Music Player Drawer (good UX)
+                            Navigator.pop(context);
+                            
+                            // 2. Kill the audio immediately
+                            ref.read(currentSongProvider.notifier).audioPlayer?.stop();
+                            
+                            // 3. Tell the Python API to execute DELETE on PostgreSQL
+                            await ref.read(homeViewmodelProvider.notifier).deleteSong(songId: deleteId);
+
+                            // 4. Scrub the UI state cleanly out of the active Music Player
+                            ref.read(currentSongProvider.notifier).clearState(deleteId);
+                          },
                           icon: const Icon(
-                            CupertinoIcons.share,
+                            CupertinoIcons.delete,
                             color: Pallete.subtitleText,
                           ),
                         ),
@@ -316,32 +355,37 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                               ),
                               builder: (context) {
-                                return Container(
-                                  padding: const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 10),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        'Up Next',
-                                        style: TextStyle(
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.bold,
-                                          color: Pallete.whiteColor,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Expanded(
-                                        child: ListView.builder(
-                                          itemCount: songNotifier.currentQueue.length,
-                                          itemBuilder: (context, index) {
-                                            final qSong = songNotifier.currentQueue[index];
-                                            final isPlaying = qSong.id == currnetSong.id;
-                                            return ListTile(
-                                              contentPadding: EdgeInsets.zero,
-                                              onTap: () {
-                                                songNotifier.updadeSong(qSong, queue: songNotifier.currentQueue);
-                                                Navigator.pop(context);
-                                              },
+                                return Consumer(
+                                  builder: (context, ref, child) {
+                                    final currentQueueSong = ref.watch(currentSongProvider);
+                                    final currentQueueNotifier = ref.watch(currentSongProvider.notifier);
+                                    
+                                    return Container(
+                                      padding: const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 10),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'Up Next',
+                                            style: TextStyle(
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.bold,
+                                              color: Pallete.whiteColor,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Expanded(
+                                            child: ListView.builder(
+                                              itemCount: currentQueueNotifier.currentQueue.length,
+                                              itemBuilder: (context, index) {
+                                                final qSong = currentQueueNotifier.currentQueue[index];
+                                                final isPlaying = currentQueueSong != null && qSong.id == currentQueueSong.id;
+                                                return ListTile(
+                                                  contentPadding: EdgeInsets.zero,
+                                                  onTap: () {
+                                                    currentQueueNotifier.updadeSong(qSong, queue: currentQueueNotifier.currentQueue);
+                                                    Navigator.pop(context);
+                                                  },
                                               leading: ClipRRect(
                                                 borderRadius: BorderRadius.circular(5),
                                                 child: Image.network(
@@ -371,8 +415,10 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                           },
                                         ),
                                       ),
-                                    ],
-                                  ),
+                                        ],
+                                      ),
+                                    );
+                                  },
                                 );
                               },
                             );

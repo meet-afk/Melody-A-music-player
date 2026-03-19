@@ -15,13 +15,29 @@ class CurrentSongNotifier extends _$CurrentSongNotifier {
   @override
   SongModel? build() {
     _homeLocalRepository = ref.watch(homeLocalRepositoryProvider);
+    
+    // FIX: Initialize AudioPlayer exactly ONCE when the app starts.
+    audioPlayer = AudioPlayer();
+
+    // MAGIC: Just Audio natively triggers this stream whenever an automatic "Next Song" happens!
+    audioPlayer!.currentIndexStream.listen((index) {
+      if (index != null && index < currentQueue.length) {
+        state = currentQueue[index];
+        _homeLocalRepository.uploadLocalSong(currentQueue[index]);
+      }
+    });
+
+    audioPlayer!.playerStateStream.listen((playerState) {
+      if (playerState.processingState == ProcessingState.completed) {
+        audioPlayer!.seek(Duration.zero, index: 0);
+        audioPlayer!.pause();
+      }
+    });
+
     return null;
   }
 
   void updadeSong(SongModel song, {List<SongModel>? queue}) async {
-    await audioPlayer?.stop();
-    audioPlayer = AudioPlayer();
-
     // If a queue is passed (e.g., all songs on screen), load it. Otherwise stick to what we have or just one song.
     if (queue != null && queue.isNotEmpty) {
       currentQueue = queue;
@@ -49,22 +65,8 @@ class CurrentSongNotifier extends _$CurrentSongNotifier {
     int initialIndex = currentQueue.indexOf(song);
     if (initialIndex == -1) initialIndex = 0;
 
+    // Load up the playlist and jump directly to the clicked song
     await audioPlayer!.setAudioSource(playlist, initialIndex: initialIndex);
-
-    // MAGIC: Just Audio natively triggers this stream whenever an automatic "Next Song" happens!
-    audioPlayer!.currentIndexStream.listen((index) {
-      if (index != null && index < currentQueue.length) {
-        state = currentQueue[index];
-        _homeLocalRepository.uploadLocalSong(currentQueue[index]);
-      }
-    });
-
-    audioPlayer!.playerStateStream.listen((playerState) {
-      if (playerState.processingState == ProcessingState.completed) {
-        audioPlayer!.seek(Duration.zero, index: 0);
-        audioPlayer!.pause();
-      }
-    });
 
     audioPlayer?.play();
   }
@@ -100,5 +102,37 @@ class CurrentSongNotifier extends _$CurrentSongNotifier {
     final minutes = duration.inMinutes;
     final seconds = twoDigits(duration.inSeconds % 60); 
     return "$minutes:$seconds";
+  }
+
+  void clearState(String deletedSongId) {
+    if (state?.id == deletedSongId) {
+      state = null;
+    }
+    // Also quietly scrub it from the active queue so it doesn't try to play again!
+    currentQueue.removeWhere((song) => song.id == deletedSongId);
+  }
+
+  void toggleShuffle() {
+    if (audioPlayer != null) {
+      final isShuffleEnabled = audioPlayer!.shuffleModeEnabled;
+      audioPlayer!.setShuffleModeEnabled(!isShuffleEnabled);
+      // Optional: actually re-roll the dice whenever it turns on so it feels fresh every time
+      if (!isShuffleEnabled) {
+        audioPlayer!.shuffle();
+      }
+    }
+  }
+
+  void toggleRepeat() {
+    if (audioPlayer != null) {
+      final currentMode = audioPlayer!.loopMode;
+      if (currentMode == LoopMode.off) {
+        audioPlayer!.setLoopMode(LoopMode.all);
+      } else if (currentMode == LoopMode.all) {
+        audioPlayer!.setLoopMode(LoopMode.one);
+      } else {
+        audioPlayer!.setLoopMode(LoopMode.off);
+      }
+    }
   }
 }

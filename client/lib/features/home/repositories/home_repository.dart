@@ -132,4 +132,25 @@ class HomeRepository {
       return Left(Appfailure(e.toString()));
     }
   }
+
+  Future<Either<Appfailure, bool>> deleteSong({
+    required String token,
+    required String songId,
+  }) async {
+    try {
+      final res = await http.delete(
+        Uri.parse('${ServerConstant.baseUrl}/song/delete/$songId'),
+        headers: {"Content-Type": "application/json", "x-auth-token": token},
+      );
+
+      var resBodyMap = jsonDecode(res.body);
+      if (res.statusCode != 200) {
+        return Left(Appfailure(resBodyMap['detail'] ?? 'Failed to delete song'));
+      }
+
+      return const Right(true);
+    } catch (e) {
+      return Left(Appfailure(e.toString()));
+    }
+  }
 }

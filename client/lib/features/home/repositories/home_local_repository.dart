@@ -25,4 +25,8 @@ class HomeLocalRepository {
     }
     return songs;
   }
+
+  void deleteLocalSong(String songId) {
+    box.delete(songId);
+  }
 }

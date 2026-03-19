@@ -6,6 +6,7 @@ import 'package:client/core/provider/current_user_notifier.dart';
 import 'package:client/core/theme/app_pallete.dart';
 import 'package:client/core/utils.dart';
 import 'package:client/features/home/repositories/home_local_repository.dart';
+import 'package:client/features/home/viewmodel/home_viewmodel.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -69,6 +70,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(homeViewmodelProvider); // Bind explicitly to react to deletions!
+    
     // Get current user details
     final currentUser = ref.watch(currentUserProvider);
     // Fetch recently played songs directly from local storage
