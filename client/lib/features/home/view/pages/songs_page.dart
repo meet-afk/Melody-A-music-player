@@ -38,11 +38,11 @@ class SongsPage extends ConsumerWidget {
             padding: const EdgeInsets.only(bottom: 36, left: 16, right: 16),
     
             child: SizedBox(
-              height: 280,
+              height: 260,
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 220,
-                  childAspectRatio: 3,
+                  maxCrossAxisExtent: 230,
+                  childAspectRatio: 4,
                   crossAxisSpacing: 8,
                   mainAxisSpacing: 8,
                 ),
@@ -65,7 +65,7 @@ class SongsPage extends ConsumerWidget {
                         children: [
                           // 1. The Image
                           Container(
-                            width: 70,
+                            width: 60,
                             decoration: BoxDecoration(
                               image: DecorationImage(
                                 image: NetworkImage(
