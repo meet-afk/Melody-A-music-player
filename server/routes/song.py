@@ -3,7 +3,7 @@ import uuid
 import cloudinary
 import cloudinary.uploader
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends, File, Form, UploadFile
+from fastapi import APIRouter, Depends, File, Form, UploadFile, HTTPException
 from sqlalchemy.orm import Session, joinedload
 from database import get_db
 from middleware.auth_middleware import auth_middleware 
@@ -93,3 +93,17 @@ def list_favourite_songs(db: Session = Depends(get_db), auth_dict = Depends(auth
     ).all()
 
     return fav_songs
+
+@router.delete('/delete/{song_id}')
+def delete_song(song_id: str, db: Session = Depends(get_db), auth_dict=Depends(auth_middleware)):
+    song = db.query(Song).filter(Song.id == song_id).first()
+    if not song:
+        raise HTTPException(status_code=404, detail="Song not found")
+    
+    # 1. Safely remove any favorites linking to this song first (foreign keys)
+    db.query(Favourite).filter(Favourite.song_id == song_id).delete()
+    
+    # 2. Delete the actual song record from the database!
+    db.delete(song)
+    db.commit()
+    return {"message": "Song deleted successfully!"}
