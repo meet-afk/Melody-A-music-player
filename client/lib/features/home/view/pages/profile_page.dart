@@ -223,7 +223,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       // Displaying in the exact same format as Library page
                       return ListTile(
                         onTap: () {
-                          ref.read(currentSongProvider.notifier).updadeSong(song);
+                          ref.read(currentSongProvider.notifier).updadeSong(song, queue: recentlyPlayedSongs);
                         },
                         leading: CircleAvatar(
                           backgroundImage: NetworkImage(song.thumbnail_url),

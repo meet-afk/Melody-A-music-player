@@ -53,7 +53,7 @@ class SongsPage extends ConsumerWidget {
                     onTap: () {
                       ref
                           .read(currentSongProvider.notifier)
-                          .updadeSong(currentSong);
+                          .updadeSong(currentSong, queue: recentlyPlayedSongs);
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -127,7 +127,7 @@ class SongsPage extends ConsumerWidget {
                           onTap: () {
                             ref
                                 .read(currentSongProvider.notifier)
-                                .updadeSong(song);
+                                .updadeSong(song, queue: songs);
                           },
                           child: Padding(
                             padding: const EdgeInsets.only(left: 16.0),

@@ -49,7 +49,7 @@ class LibraryPage extends ConsumerWidget {
                 final song = data[index];
                 return ListTile(
                   onTap: () {
-                    ref.read(currentSongProvider.notifier).updadeSong(song);
+                    ref.read(currentSongProvider.notifier).updadeSong(song, queue: data);
                   },
                   leading: CircleAvatar(
                     backgroundImage: NetworkImage(song.thumbnail_url),

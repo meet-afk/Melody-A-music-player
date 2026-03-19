@@ -240,7 +240,7 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                       Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: IconButton(
-                          onPressed: () {},
+                          onPressed: songNotifier.playPrevious,
                           icon: const Icon(
                             CupertinoIcons.backward_end_fill,
                             color: Pallete.whiteColor,
@@ -271,7 +271,7 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                       Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: IconButton(
-                          onPressed: () {},
+                          onPressed: songNotifier.playNext,
                           icon: const Icon(
                             CupertinoIcons.forward_end_fill,
                             color: Pallete.whiteColor,
@@ -308,7 +308,75 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                       Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context,
+                              backgroundColor: Pallete.cardColor,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                              ),
+                              builder: (context) {
+                                return Container(
+                                  padding: const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 10),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Up Next',
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                          color: Pallete.whiteColor,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Expanded(
+                                        child: ListView.builder(
+                                          itemCount: songNotifier.currentQueue.length,
+                                          itemBuilder: (context, index) {
+                                            final qSong = songNotifier.currentQueue[index];
+                                            final isPlaying = qSong.id == currnetSong.id;
+                                            return ListTile(
+                                              contentPadding: EdgeInsets.zero,
+                                              onTap: () {
+                                                songNotifier.updadeSong(qSong, queue: songNotifier.currentQueue);
+                                                Navigator.pop(context);
+                                              },
+                                              leading: ClipRRect(
+                                                borderRadius: BorderRadius.circular(5),
+                                                child: Image.network(
+                                                  qSong.thumbnail_url,
+                                                  width: 50,
+                                                  height: 50,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              title: Text(
+                                                qSong.song_name,
+                                                style: TextStyle(
+                                                  color: isPlaying ? Pallete.gradient2 : Pallete.whiteColor,
+                                                  fontWeight: isPlaying ? FontWeight.bold : FontWeight.w600,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              subtitle: Text(
+                                                qSong.artist,
+                                                style: const TextStyle(color: Pallete.subtitleText),
+                                              ),
+                                              trailing: isPlaying 
+                                                ? const Icon(Icons.multitrack_audio, color: Pallete.gradient1)
+                                                : null,
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
                           icon: const Icon(
                             CupertinoIcons.list_bullet,
                             color: Pallete.subtitleText,
