@@ -29,7 +29,6 @@ A beautiful, full-stack cross-platform music streaming application. Melody featu
 ---
 
 ## 📸 Screenshots
-*(Add your screenshots here by dragging and dropping images into the GitHub editor!)*
 | Home Feed | Active Player | Profile |
 | :---: | :---: | :---: |
 | <img src="https://github.com/meet-afk/Melody-A-music-player/blob/main/client/assets/screenshots/home_page.jpg?raw=true" width="200"/> | <img src="https://github.com/meet-afk/Melody-A-music-player/blob/main/client/assets/screenshots/music_player.jpg?raw=true" width="200"/> | <img src="https://github.com/meet-afk/Melody-A-music-player/blob/main/client/assets/screenshots/profile.jpg?raw=true" width="200"/> |
@@ -48,3 +47,46 @@ A beautiful, full-stack cross-platform music streaming application. Melody featu
 1. Navigate to the backend directory:
    ```bash
    cd server
+
+    Create a virtual environment and install dependencies:
+    Bash
+
+    python -m venv venv
+    source venv/bin/activate  # On Windows: venv\Scripts\activate
+    pip install -r requirements.txt
+
+    Create a .env file in the root of the server directory and add your credentials:
+    Code snippet
+
+    DATABASE_URL=your_postgresql_url
+    CLOUDINARY_CLOUD_NAME=your_cloud_name
+    CLOUDINARY_API_KEY=your_api_key
+    API_SECRET=your_api_secret
+    JWT_SECRET=your_jwt_secret
+
+    Start the server:
+    Bash
+
+    uvicorn main:app --reload
+
+2. Frontend Setup (Flutter)
+
+    Navigate to the client directory:
+    Bash
+
+    cd client
+
+    Install dependencies:
+    Bash
+
+    flutter pub get
+
+    Run Riverpod code generation (if you make changes to providers):
+    Bash
+
+    flutter pub run build_runner build --delete-conflicting-outputs
+
+    Run the app on your emulator or connected device:
+    Bash
+
+    flutter run
