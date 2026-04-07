@@ -1,92 +1,157 @@
 # 🎵 Melody
 
-A beautiful, full-stack cross-platform music streaming application. Melody features a fluid, Spotify-inspired user interface, seamless audio playback, and a robust Python backend. 
+A beautiful, full-stack, cross-platform music streaming application. **Melody** features a fluid, Spotify-inspired UI, seamless audio playback, and a robust Python backend.
+
+---
 
 ## ✨ Features
 
-* **Gapless Playback:** Smooth, uninterrupted audio streaming, skipping, and seeking powered by `just_audio`.
-* **Dynamic UI Gradients:** The app visually adapts to the music, extracting hex colors from album art to paint the background gradients.
-* **Optimistic UI Updates:** Instant, zero-lag visual feedback when liking or unliking songs.
-* **Recently Played History:** Fast, locally-cached listening history utilizing Hive storage.
-* **Cloud Media Hosting:** Secure and fast upload/retrieval of audio files and thumbnails via Cloudinary.
-* **Custom Profiles:** On-device profile image picking and user authentication.
-* **Persistent Queues:** Contextual song queues based on the playlist or library section you are currently browsing.
+- 🎧 **Gapless Playback**  
+  Smooth, uninterrupted audio streaming with support for skipping and seeking using `just_audio`.
+
+- 🎨 **Dynamic UI Gradients**  
+  Automatically extracts colors from album art and applies adaptive background gradients.
+
+- ⚡ **Optimistic UI Updates**  
+  Instant visual feedback when liking or unliking songs (no waiting for server response).
+
+- 🕘 **Recently Played History**  
+  Fast, locally cached listening history using Hive storage.
+
+- ☁️ **Cloud Media Hosting**  
+  Secure upload and retrieval of audio files and thumbnails via Cloudinary.
+
+- 👤 **Custom Profiles**  
+  User authentication with on-device profile image selection.
+
+- 📜 **Persistent Queues**  
+  Context-aware song queues based on playlists or browsing sections.
+
+---
 
 ## 🛠️ Tech Stack
 
-**Frontend (Mobile App)**
-* **Framework:** [Flutter](https://flutter.dev/)
-* **State Management:** [Riverpod](https://riverpod.dev/) (Auto-Dispose & Keep-Alive architectures)
-* **Audio Engine:** `just_audio`
-* **Local Storage:** Hive & Shared Preferences
+### 📱 Frontend (Mobile App)
+- **Framework:** Flutter  
+- **State Management:** Riverpod (AutoDispose & KeepAlive)  
+- **Audio Engine:** just_audio  
+- **Local Storage:** Hive, SharedPreferences  
 
-**Backend (REST API)**
-* **Framework:** [FastAPI](https://fastapi.tiangolo.com/) (Python)
-* **Database:** PostgreSQL with SQLAlchemy (ORM)
-* **Media Storage:** Cloudinary
-* **Authentication:** JWT (JSON Web Tokens)
+### ⚙️ Backend (REST API)
+- **Framework:** FastAPI (Python)  
+- **Database:** PostgreSQL + SQLAlchemy (ORM)  
+- **Media Storage:** Cloudinary  
+- **Authentication:** JWT (JSON Web Tokens)  
 
 ---
 
 ## 📸 Screenshots
+
 | Home Feed | Active Player | Profile |
-| :---: | :---: | :---: |
+|----------|--------------|--------|
 | <img src="https://github.com/meet-afk/Melody-A-music-player/blob/main/client/assets/screenshots/home_page.jpg?raw=true" width="200"/> | <img src="https://github.com/meet-afk/Melody-A-music-player/blob/main/client/assets/screenshots/music_player.jpg?raw=true" width="200"/> | <img src="https://github.com/meet-afk/Melody-A-music-player/blob/main/client/assets/screenshots/profile.jpg?raw=true" width="200"/> |
 
 ---
 
 ## 🚀 Installation & Setup
 
-### Prerequisites
-* [Flutter SDK](https://docs.flutter.dev/get-started/install) installed.
-* [Python 3.8+](https://www.python.org/downloads/) installed.
-* A Cloudinary account.
-* A PostgreSQL database instance.
+### ✅ Prerequisites
+- Flutter SDK installed  
+- Python 3.8+ installed  
+- PostgreSQL database  
+- Cloudinary account  
 
-### 1. Backend Setup (FastAPI)
-1. Navigate to the backend directory:
-   ```bash
-   cd server
+---
 
-    Create a virtual environment and install dependencies:
-    Bash
+## 🔧 Backend Setup (FastAPI)
 
-    python -m venv venv
-    source venv/bin/activate  # On Windows: venv\Scripts\activate
-    pip install -r requirements.txt
+```bash
+cd server
+```
 
-    Create a .env file in the root of the server directory and add your credentials:
-    Code snippet
+### 1. Create Virtual Environment
+```bash
+python -m venv venv
+```
 
-    DATABASE_URL=your_postgresql_url
-    CLOUDINARY_CLOUD_NAME=your_cloud_name
-    CLOUDINARY_API_KEY=your_api_key
-    API_SECRET=your_api_secret
-    JWT_SECRET=your_jwt_secret
+### 2. Activate Environment
 
-    Start the server:
-    Bash
+**Windows**
+```bash
+venv\Scripts\activate
+```
 
-    uvicorn main:app --reload
+**Mac/Linux**
+```bash
+source venv/bin/activate
+```
 
-2. Frontend Setup (Flutter)
+### 3. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
 
-    Navigate to the client directory:
-    Bash
+### 4. Create `.env` File
 
-    cd client
+```env
+DATABASE_URL=your_postgresql_url
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+JWT_SECRET=your_jwt_secret
+```
 
-    Install dependencies:
-    Bash
+### 5. Run Server
+```bash
+uvicorn main:app --reload
+```
 
-    flutter pub get
+---
 
-    Run Riverpod code generation (if you make changes to providers):
-    Bash
+## 📱 Frontend Setup (Flutter)
 
-    flutter pub run build_runner build --delete-conflicting-outputs
+```bash
+cd client
+```
 
-    Run the app on your emulator or connected device:
-    Bash
+### 1. Install Dependencies
+```bash
+flutter pub get
+```
 
-    flutter run
+### 2. Run Code Generation (Riverpod)
+```bash
+flutter pub run build_runner build --delete-conflicting-outputs
+```
+
+### 3. Run the App
+```bash
+flutter run
+```
+
+---
+
+## 📌 Future Improvements
+
+- 🎶 Playlist sharing  
+- 🌐 Web version  
+- 🤖 AI-based music recommendations  
+- 📊 Listening analytics dashboard  
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to fork the repo and submit a pull request.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 💙 Acknowledgements
+
+Inspired by Spotify UI/UX and modern music streaming apps.
