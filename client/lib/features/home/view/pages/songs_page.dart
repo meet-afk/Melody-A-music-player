@@ -212,11 +212,14 @@ class SongsPage extends ConsumerWidget {
                 .when(
                   data: (songs) {
                     if (songs.isEmpty) {
-                      return Padding(
-                        padding: const EdgeInsets.only(left: 16.0, bottom: 20),
-                        child: Text(
-                          "You haven't favorited any songs yet.",
-                          style: TextStyle(color: Pallete.subtitleText),
+                      return SizedBox(
+                        height: 220, 
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 16.0, top: 8.0),
+                          child: Text(
+                            "You haven't favorited any songs yet.",
+                            style: const TextStyle(color: Pallete.subtitleText),
+                          ),
                         ),
                       );
                     }
